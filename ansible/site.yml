@@ -1,0 +1,13 @@
+---
+# Playbook principal - Los Rompe Código
+# Ejecutar: ansible-playbook -i aws_ec2.yml site.yml
+
+- name: Configurar servidores web de RompeCode
+  hosts: webservers
+  become: true
+  gather_facts: true
+
+  roles:
+    - common
+    - webserver
+    - deploy
