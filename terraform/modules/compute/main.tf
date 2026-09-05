@@ -48,7 +48,7 @@ resource "aws_security_group" "alb_sg" {
 # ---------- Security Group de las EC2 ----------
 resource "aws_security_group" "ec2_sg" {
   name        = "${var.project}-ec2-sg"
-  description = "Permite HTTP solo desde el ALB (mínimo privilegio)"
+  description = "Permite HTTP solo desde el ALB (minimo privilegio)"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -60,7 +60,7 @@ resource "aws_security_group" "ec2_sg" {
   }
 
   ingress {
-    description = "SSH solo desde IP de administración (opcional, ajustar/eliminar en prod)"
+    description = "SSH solo desde IP de administracion (opcional, ajustar/eliminar en prod)"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"

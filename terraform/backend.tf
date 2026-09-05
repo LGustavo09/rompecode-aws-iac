@@ -13,7 +13,7 @@
 
 terraform {
   backend "s3" {
-    bucket         = "rompecode-tfstate-CAMBIAR-ESTE-NOMBRE"
+    bucket         = "rompecode-tfstate-julio2026"
     key            = "rompecode/terraform.tfstate"
     region         = "us-east-1"
     dynamodb_table = "rompecode-tf-lock"
