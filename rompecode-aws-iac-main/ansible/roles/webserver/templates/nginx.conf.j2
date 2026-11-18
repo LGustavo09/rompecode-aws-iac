@@ -1,0 +1,17 @@
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/share/nginx/html/rompecode;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    # Endpoint simple de health check para el Target Group del ALB
+    location /health {
+        return 200 'OK - {{ inventory_hostname }}';
+        add_header Content-Type text/plain;
+    }
+}

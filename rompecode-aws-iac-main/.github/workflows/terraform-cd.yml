@@ -1,0 +1,82 @@
+name: Terraform CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "terraform/**"
+      - "ansible/**"
+      - "app/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    environment: production  # requiere aprobación manual (configurar en Settings > Environments)
+    defaults:
+      run:
+        working-directory: terraform
+    outputs:
+      alb_dns: ${{ steps.output.outputs.alb_dns }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.7.5"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+      - name: Obtener output del ALB
+        id: output
+        run: echo "alb_dns=$(terraform output -raw alb_dns_name)" >> "$GITHUB_OUTPUT"
+
+  configure:
+    name: Ansible Configure
+    needs: apply
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar Ansible y dependencias
+        run: |
+          pip install ansible boto3 botocore
+          ansible-galaxy collection install amazon.aws ansible.posix
+
+      - name: Esperar a que las instancias estén healthy
+        run: sleep 60
+
+      - name: Ejecutar playbook de Ansible
+        working-directory: ansible
+        run: ansible-playbook -i aws_ec2.yml site.yml
+
+      - name: Mostrar URL de la aplicación
+        run: echo "App disponible en http://${{ needs.apply.outputs.alb_dns }}"

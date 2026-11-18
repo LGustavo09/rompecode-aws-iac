@@ -1,0 +1,23 @@
+# Inventario dinámico: descubre automáticamente las EC2 del Auto Scaling Group
+# por medio del tag Name=rompecode-app (ajustar si cambias project_name en Terraform)
+plugin: amazon.aws.aws_ec2
+
+regions:
+  - us-east-1
+
+filters:
+  tag:Name: rompecode-app
+  instance-state-name: running
+
+# Agrupa automáticamente todas las instancias encontradas bajo "webservers"
+keyed_groups:
+  - key: tags.Name
+    prefix: tag
+
+groups:
+  webservers: "'rompecode-app' in (tags.Name | default(''))"
+
+# Usa la IP privada porque las instancias están en subredes privadas;
+# Ansible debe correr desde un bastion/VPN o desde el runner de CI/CD con acceso a la VPC.
+compose:
+  ansible_host: private_ip_address

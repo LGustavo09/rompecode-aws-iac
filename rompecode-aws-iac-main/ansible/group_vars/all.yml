@@ -1,0 +1,5 @@
+---
+project_name: rompecode
+team_name: "Los Rompe Codigo"
+ansible_user: ec2-user
+ansible_python_interpreter: /usr/bin/python3

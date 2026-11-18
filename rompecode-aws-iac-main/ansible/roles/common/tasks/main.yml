@@ -1,0 +1,36 @@
+---
+# Rol common: tareas base aplicadas a TODOS los servidores
+# Idempotente: correr 2-3 veces seguidas debe dar changed=0 la 2da/3ra vez.
+
+- name: Actualizar caché de paquetes e instalar utilidades base
+  ansible.builtin.dnf:
+    name:
+      - curl
+      - git
+      - unzip
+      - firewalld
+    state: present
+    update_cache: true
+  become: true
+
+- name: Asegurar que firewalld está activo y habilitado
+  ansible.builtin.systemd:
+    name: firewalld
+    state: started
+    enabled: true
+  become: true
+
+- name: Permitir tráfico HTTP en el firewall local
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    immediate: true
+    state: enabled
+  become: true
+
+- name: Crear usuario de despliegue (deploy) si no existe
+  ansible.builtin.user:
+    name: deploy
+    shell: /bin/bash
+    create_home: true
+  become: true
