@@ -77,7 +77,7 @@ jobs:
           PLAN: "${{ steps.plan.outputs.stdout }}"
         with:
           script: |
-            const output = `#### Terraform Plan 📖
+            const output = `#### Terraform Plan 
             \`\`\`
             ${process.env.PLAN}
             \`\`\`
