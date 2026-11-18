@@ -54,4 +54,3 @@ module "compute" {
   asg_max_size        = var.asg_max_size
   tags                = local.common_tags
 }
-error_intentcional
