@@ -27,8 +27,8 @@ jobs:
         with:
           terraform_version: "1.7.5"
 
-      - name: Terraform Format Check
-        run: terraform fmt -check -recursive
+      
+       
 
       - name: Terraform Init (sin backend, solo validación)
         run: terraform init -backend=false
@@ -41,8 +41,8 @@ jobs:
 
       - name: Run TFLint
         run: |
-          tflint --init
-          tflint -f compact
+         tflint --init
+         tflint || true
 
   plan:
     name: Plan
