@@ -95,7 +95,7 @@ resource "aws_lb_target_group" "app" {
   vpc_id   = var.vpc_id
 
   health_check {
-    path                = "/"
+    path                = "/health"
     protocol            = "HTTP"
     healthy_threshold   = 2
     unhealthy_threshold = 3
@@ -147,27 +147,21 @@ resource "aws_launch_template" "app" {
     tags          = merge(var.tags, { Name = "${var.project}-app" })
   }
 
-  # Ansible se encarga de la configuración real vía inventario dinámico;
-  # este user_data solo deja el host listo para SSM/Ansible.
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    dnf update -y
-    dnf install -y python3 amazon-ssm-agent
-    systemctl enable amazon-ssm-agent
-    systemctl start amazon-ssm-agent
-  EOF
-  )
+  # Cada instancia del ASG sirve el portal desde su primer arranque.
+  user_data = base64encode(templatefile("${path.module}/bootstrap.sh.tftpl", {
+    portal_base64 = filebase64("${path.root}/../app/index.html")
+  }))
 }
 
 # ---------- Auto Scaling Group ----------
 resource "aws_autoscaling_group" "app" {
-  name                = "${var.project}-asg"
-  min_size            = var.asg_min_size
-  desired_capacity    = var.asg_desired_capacity
-  max_size            = var.asg_max_size
-  vpc_zone_identifier = var.private_subnet_ids
-  target_group_arns   = [aws_lb_target_group.app.arn]
-  health_check_type   = "ELB"
+  name                      = "${var.project}-asg"
+  min_size                  = var.asg_min_size
+  desired_capacity          = var.asg_desired_capacity
+  max_size                  = var.asg_max_size
+  vpc_zone_identifier       = var.private_subnet_ids
+  target_group_arns         = [aws_lb_target_group.app.arn]
+  health_check_type         = "ELB"
   health_check_grace_period = 60
 
   launch_template {
