@@ -4,15 +4,18 @@ output "alb_dns_name" {
 }
 
 output "vpc_id" {
-  value = module.vpc.vpc_id
+  description = "ID de la VPC del proyecto"
+  value       = module.vpc.vpc_id
 }
 
 output "public_subnet_ids" {
-  value = module.vpc.public_subnet_ids
+  description = "IDs de las subredes públicas"
+  value       = module.vpc.public_subnet_ids
 }
 
 output "private_subnet_ids" {
-  value = module.vpc.private_subnet_ids
+  description = "IDs de las subredes privadas"
+  value       = module.vpc.private_subnet_ids
 }
 
 output "asg_name" {

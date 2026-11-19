@@ -59,13 +59,6 @@ resource "aws_security_group" "ec2_sg" {
     security_groups = [aws_security_group.alb_sg.id]
   }
 
-  ingress {
-    description = "SSH solo desde IP de administracion (opcional, ajustar/eliminar en prod)"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.admin_cidr]
-  }
 
   egress {
     from_port   = 0
@@ -107,7 +100,7 @@ resource "aws_lb_target_group" "app" {
   stickiness {
     type            = "lb_cookie"
     cookie_duration = 300
-    enabled         = true
+    enabled         = false
   }
 
   tags = var.tags
@@ -124,12 +117,36 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+resource "aws_iam_role" "app" {
+  name = "${var.project}-ec2-ssm"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Action    = "sts:AssumeRole"
+      Principal = { Service = "ec2.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.app.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "app" {
+  name = "${var.project}-ec2-ssm"
+  role = aws_iam_role.app.name
+}
+
 # ---------- Launch Template ----------
 resource "aws_launch_template" "app" {
   name_prefix   = "${var.project}-lt-"
   image_id      = data.aws_ami.amazon_linux.id
   instance_type = var.instance_type
-  key_name      = var.key_name
+  iam_instance_profile {
+    name = aws_iam_instance_profile.app.name
+  }
 
   metadata_options {
     http_endpoint               = "enabled"
@@ -149,12 +166,19 @@ resource "aws_launch_template" "app" {
 
   # Cada instancia del ASG sirve el portal desde su primer arranque.
   user_data = base64encode(templatefile("${path.module}/bootstrap.sh.tftpl", {
-    portal_base64 = filebase64("${path.root}/../app/index.html")
+    files = {
+      "/usr/share/nginx/html/rompecode/index.html" = filebase64("${path.root}/../app/index.html")
+      "/opt/rompecode/server.py"                   = filebase64("${path.root}/../app/server.py")
+      "/etc/nginx/nginx.conf"                      = filebase64("${path.root}/../app/nginx.conf")
+      "/etc/nginx/conf.d/rompecode.conf"           = filebase64("${path.root}/../app/rompecode.conf")
+      "/etc/systemd/system/rompecode.service"      = filebase64("${path.root}/../app/rompecode.service")
+    }
   }))
 }
 
 # ---------- Auto Scaling Group ----------
 resource "aws_autoscaling_group" "app" {
+  depends_on                = [aws_iam_role_policy_attachment.ssm]
   name                      = "${var.project}-asg"
   min_size                  = var.asg_min_size
   desired_capacity          = var.asg_desired_capacity

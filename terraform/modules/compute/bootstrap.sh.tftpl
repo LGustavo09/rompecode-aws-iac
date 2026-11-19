@@ -2,46 +2,15 @@
 set -euo pipefail
 
 dnf install -y nginx python3 amazon-ssm-agent
+install -d -m 0755 /usr/share/nginx/html/rompecode /opt/rompecode
 
-install -d -m 0755 /usr/share/nginx/html/rompecode
-base64 --decode > /usr/share/nginx/html/rompecode/index.html <<'PORTAL'
-${portal_base64}
-PORTAL
-chmod 0644 /usr/share/nginx/html/rompecode/index.html
-
-cat > /etc/nginx/nginx.conf <<'NGINX'
-user nginx;
-worker_processes auto;
-pid /run/nginx.pid;
-
-events {
-    worker_connections 1024;
-}
-
-http {
-    include /etc/nginx/mime.types;
-    default_type application/octet-stream;
-    include /etc/nginx/conf.d/*.conf;
-}
-NGINX
-
-cat > /etc/nginx/conf.d/rompecode.conf <<'SITE'
-server {
-    listen 80 default_server;
-    server_name _;
-    root /usr/share/nginx/html/rompecode;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ =404;
-    }
-
-    location = /health {
-        default_type text/plain;
-        return 200 "OK\n";
-    }
-}
-SITE
+%{ for destination, content in files ~}
+base64 --decode > "${destination}" <<'FILE'
+${content}
+FILE
+chmod 0644 "${destination}"
+%{ endfor ~}
 
 nginx -t
-systemctl enable --now nginx amazon-ssm-agent
+systemctl daemon-reload
+systemctl enable --now nginx amazon-ssm-agent rompecode

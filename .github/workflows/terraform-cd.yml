@@ -1,12 +1,7 @@
 name: Terraform CD
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "terraform/**"
-      - "ansible/**"
-      - "app/**"
+  workflow_dispatch:
 
 permissions:
   id-token: write
@@ -16,12 +11,14 @@ jobs:
   apply:
     name: Terraform Apply
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     environment: production  # requiere aprobación manual (configurar en Settings > Environments)
     defaults:
       run:
         working-directory: terraform
     outputs:
       alb_dns: ${{ steps.output.outputs.alb_dns }}
+      ssm_bucket: ${{ steps.output.outputs.ssm_bucket }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,7 +26,7 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Setup Terraform
@@ -45,12 +42,15 @@ jobs:
 
       - name: Obtener output del ALB
         id: output
-        run: echo "alb_dns=$(terraform output -raw alb_dns_name)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "alb_dns=$(terraform output -raw alb_dns_name)" >> "$GITHUB_OUTPUT"
+          echo "ssm_bucket=$(terraform output -raw ansible_transfer_bucket)" >> "$GITHUB_OUTPUT"
 
   configure:
     name: Ansible Configure
     needs: apply
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Setup Python
@@ -70,12 +70,30 @@ jobs:
         run: |
           pip install ansible boto3 botocore
           ansible-galaxy collection install amazon.aws ansible.posix
+          curl -fsSL https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb -o /tmp/session-manager-plugin.deb
+          sudo dpkg -i /tmp/session-manager-plugin.deb
 
-      - name: Esperar a que las instancias estén healthy
-        run: sleep 60
+      - name: Esperar a que las instancias aparezcan en SSM
+        run: |
+          for attempt in {1..40}; do
+            ids=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names rompecode-asg --query 'AutoScalingGroups[0].Instances[?LifecycleState==`InService`].InstanceId' --output text)
+            if [[ -n "$ids" && "$ids" != "None" ]]; then
+              online=$(aws ssm describe-instance-information --query 'InstanceInformationList[?PingStatus==`Online`].InstanceId' --output text)
+              ready=true
+              for id in $ids; do
+                grep -qw "$id" <<< "$online" || ready=false
+              done
+              if [[ "$ready" == true ]] && [[ "$(wc -w <<< "$ids")" -ge 2 ]]; then exit 0; fi
+            fi
+            sleep 15
+          done
+          echo "Las instancias del ASG no aparecieron en SSM a tiempo" >&2
+          exit 1
 
       - name: Ejecutar playbook de Ansible
         working-directory: ansible
+        env:
+          ANSIBLE_SSM_BUCKET: ${{ needs.apply.outputs.ssm_bucket }}
         run: ansible-playbook -i aws_ec2.yml site.yml
 
       - name: Mostrar URL de la aplicación

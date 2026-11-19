@@ -24,31 +24,22 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
-variable "key_name" {
-  description = "Nombre del key pair de EC2 (opcional, dejar null si se usa SSM)"
-  type        = string
-  default     = null
-}
-
-variable "admin_cidr" {
-  description = "CIDR permitido para SSH de administración"
-  type        = string
-  default     = "0.0.0.0/0" # ⚠️ Reemplazar por tu IP pública real, ej: 190.x.x.x/32
-}
-
 variable "asg_min_size" {
-  type    = number
-  default = 2
+  description = "Capacidad mínima del ASG"
+  type        = number
+  default     = 2
 }
 
 variable "asg_desired_capacity" {
-  type    = number
-  default = 2
+  description = "Capacidad deseada del ASG"
+  type        = number
+  default     = 2
 }
 
 variable "asg_max_size" {
-  type    = number
-  default = 6
+  description = "Capacidad máxima del ASG"
+  type        = number
+  default     = 6
 }
 
 variable "tags" {

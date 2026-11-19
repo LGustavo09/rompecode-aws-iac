@@ -17,7 +17,5 @@ keyed_groups:
 groups:
   webservers: "'rompecode-app' in (tags.Name | default(''))"
 
-# Usa la IP privada porque las instancias están en subredes privadas;
-# Ansible debe correr desde un bastion/VPN o desde el runner de CI/CD con acceso a la VPC.
 compose:
-  ansible_host: private_ip_address
+  ansible_host: instance_id

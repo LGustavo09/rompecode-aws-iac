@@ -1,35 +1,36 @@
 ---
-# Rol deploy: despliega el código estático de la Landing Page
-
-- name: Copiar la Landing Page al servidor
-  ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../app/index.html"
-    dest: /usr/share/nginx/html/rompecode/index.html
-    owner: nginx
-    group: nginx
-    mode: "0644"
+- name: Crear directorio para el servicio del portal
+  ansible.builtin.file:
+    path: /opt/rompecode
+    state: directory
+    mode: "0755"
   become: true
+
+- name: Copiar archivos del portal y del servicio
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../app/{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "0644"
+  loop:
+    - { src: "index.html", dest: "/usr/share/nginx/html/rompecode/index.html" }
+    - { src: "server.py", dest: "/opt/rompecode/server.py" }
+    - { src: "nginx.conf", dest: "/etc/nginx/nginx.conf" }
+    - { src: "rompecode.conf", dest: "/etc/nginx/conf.d/rompecode.conf" }
+    - { src: "rompecode.service", dest: "/etc/systemd/system/rompecode.service" }
+  become: true
+  register: portal_files
   notify: reiniciar nginx
 
-- name: Copiar assets adicionales si existen (css/js/imágenes)
-  ansible.builtin.copy:
-    src: "{{ playbook_dir }}/../app/"
-    dest: /usr/share/nginx/html/rompecode/
-    owner: nginx
-    group: nginx
-    mode: "0644"
-    directory_mode: "0755"
+- name: Validar configuración de Nginx
+  ansible.builtin.command: nginx -t
+  changed_when: false
+  when: portal_files.changed
   become: true
-  notify: reiniciar nginx
 
-- name: Registrar versión del despliegue
-  ansible.builtin.copy:
-    content: |
-      Deploy version: {{ deploy_version | default('dev') }}
-      Deployed at: {{ ansible_date_time.iso8601 }}
-      Host: {{ inventory_hostname }}
-    dest: /usr/share/nginx/html/rompecode/version.txt
-    owner: nginx
-    group: nginx
-    mode: "0644"
+- name: Mantener el servicio del portal activo
+  ansible.builtin.systemd:
+    name: rompecode
+    enabled: true
+    daemon_reload: "{{ portal_files.changed }}"
+    state: "{{ 'restarted' if portal_files.changed else 'started' }}"
   become: true

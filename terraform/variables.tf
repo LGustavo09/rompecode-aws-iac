@@ -17,42 +17,43 @@ variable "environment" {
 }
 
 variable "vpc_cidr" {
-  type    = string
-  default = "10.0.0.0/16"
+  description = "Bloque CIDR de la VPC"
+  type        = string
+  default     = "10.0.0.0/16"
 }
 
 variable "public_subnet_cidrs" {
-  type    = list(string)
-  default = ["10.0.1.0/24", "10.0.2.0/24"]
+  description = "CIDR de las subredes públicas"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
 }
 
 variable "private_subnet_cidrs" {
-  type    = list(string)
-  default = ["10.0.10.0/24", "10.0.20.0/24"]
+  description = "CIDR de las subredes privadas"
+  type        = list(string)
+  default     = ["10.0.10.0/24", "10.0.20.0/24"]
 }
 
 variable "instance_type" {
-  type    = string
-  default = "t3.micro"
-}
-
-variable "admin_cidr" {
-  description = "Tu IP pública en formato CIDR, ej: 190.12.34.56/32. NO dejar 0.0.0.0/0 en producción."
+  description = "Tipo de instancia EC2"
   type        = string
-  default     = "0.0.0.0/0"
+  default     = "t3.micro"
 }
 
 variable "asg_min_size" {
-  type    = number
-  default = 2
+  description = "Capacidad mínima del ASG"
+  type        = number
+  default     = 2
 }
 
 variable "asg_desired_capacity" {
-  type    = number
-  default = 2
+  description = "Capacidad deseada del ASG"
+  type        = number
+  default     = 2
 }
 
 variable "asg_max_size" {
-  type    = number
-  default = 6
+  description = "Capacidad máxima del ASG"
+  type        = number
+  default     = 6
 }
