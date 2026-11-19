@@ -1,0 +1,46 @@
+=== IDENTIDAD ===
+{
+    "UserId": "AIDATQKSOWVKIBD25IR4E",
+    "Account": "241227969876",
+    "Arn": "arn:aws:iam::241227969876:user/Julio-devops"
+}
+=== SSM ===
+-----------------------------------
+|   DescribeInstanceInformation   |
++----------------------+----------+
+|  i-0e697600cbe26f9e0 |  Online  |
+|  i-060543cd2f90d01d2 |  Online  |
++----------------------+----------+
+=== INVENTARIO ===
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: Importing 'to_text' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[DEPRECATION WARNING]: Importing 'to_native' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[DEPRECATION WARNING]: Passing `disable_lookups` to `template` is deprecated. This feature will be removed from ansible-core version 2.23.
+@all:
+  |--@ungrouped:
+  |--@aws_ec2:
+  |  |--ip-10-0-10-214.ec2.internal
+  |  |--ip-10-0-20-86.ec2.internal
+  |--@webservers:
+  |  |--ip-10-0-10-214.ec2.internal
+  |  |--ip-10-0-20-86.ec2.internal
+  |--@tag_rompecode_app:
+  |  |--ip-10-0-10-214.ec2.internal
+  |  |--ip-10-0-20-86.ec2.internal
+=== PING ===
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: Importing 'to_text' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[DEPRECATION WARNING]: Importing 'to_native' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[DEPRECATION WARNING]: Passing `disable_lookups` to `template` is deprecated. This feature will be removed from ansible-core version 2.23.
+[WARNING]: Found variable using reserved name 'tags'.
+Origin: <unknown>
+
+tags
+
+[DEPRECATION WARNING]: Importing 'to_bytes' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+ip-10-0-20-86.ec2.internal | SUCCESS => 
+    changed: false
+    ping: pong
+ip-10-0-10-214.ec2.internal | SUCCESS => 
+    changed: false
+    ping: pong

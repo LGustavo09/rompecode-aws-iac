@@ -1,0 +1,10 @@
+EXTRACT FROM ORIGINAL LOG - TAG v1.0-listo WITHOUT CHANGES
+Source: ansible/run1-v1.0-listo.log
+
+TASK [common : Update package cache and install base utilities]
+[ERROR]: Module failed: Depsolve Error occurred
+Cause: installed curl-minimal conflicts with curl requested by role common.
+
+PLAY RECAP - hosts processed:
+ip-10-0-10-214.ec2.internal : ok=1 changed=0 unreachable=0 failed=1 skipped=0 rescued=0 ignored=0
+ip-10-0-20-86.ec2.internal : ok=1 changed=0 unreachable=0 failed=1 skipped=0 rescued=0 ignored=0

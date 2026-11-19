@@ -1,0 +1,15 @@
+EV-01 - Ansible environment and AWS identity
+2026-11-18T22:50:15-05:00
+aws-cli/2.41.1 Python/3.14.8 Linux/6.18.58.1-microsoft-standard-WSL2 script-exe/x86_64.ubuntu.26
+ansible [core 2.20.1]
+  config file = None
+1.2.896.0
+[WARNING]: Collection at '/usr/lib/python3/dist-packages/ansible/_internal/ansible_collections/ansible/_protomatter' does not have a MANIFEST.json file, nor has it galaxy.yml: cannot detect version.
+amazon.aws                               10.1.2 
+ansible.posix                            2.1.0  
+community.aws                            10.0.0 
+{
+    "UserId": "AIDATQKSOWVKIBD25IR4E",
+    "Account": "241227969876",
+    "Arn": "arn:aws:iam::241227969876:user/Julio-devops"
+}

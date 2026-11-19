@@ -1,0 +1,8 @@
+FIRST RUN - TEST COPY WITH ONLY THE CURL LINE REMOVED
+Tag: v1.0-listo | task result: completed
+Gathering Facts: ok on both hosts
+common, webserver, deploy: tasks completed
+PLAY RECAP:
+ip-10-0-10-214.ec2.internal : ok=14 changed=8 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+ip-10-0-20-86.ec2.internal : ok=14 changed=8 unreachable=0 failed=0 skipped=0 rescued=0 ignored=0
+SSM cleanup warnings appeared during file transfer; playbook completed successfully.
