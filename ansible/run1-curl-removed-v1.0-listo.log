@@ -1,0 +1,93 @@
+[WARNING]: Deprecation warnings can be disabled by setting `deprecation_warnings=False` in ansible.cfg.
+[DEPRECATION WARNING]: Importing 'to_text' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[DEPRECATION WARNING]: Importing 'to_native' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+[DEPRECATION WARNING]: Passing `disable_lookups` to `template` is deprecated. This feature will be removed from ansible-core version 2.23.
+[WARNING]: Found variable using reserved name 'tags'.
+Origin: <unknown>
+
+tags
+
+
+PLAY [Configurar servidores web de RompeCode] **********************************
+
+TASK [Gathering Facts] *********************************************************
+[DEPRECATION WARNING]: Importing 'to_bytes' from 'ansible.module_utils._text' is deprecated. This feature will be removed from ansible-core version 2.24. Use ansible.module_utils.common.text.converters instead.
+ok: [ip-10-0-10-214.ec2.internal]
+ok: [ip-10-0-20-86.ec2.internal]
+
+TASK [common : Actualizar caché de paquetes e instalar utilidades base] ********
+changed: [ip-10-0-20-86.ec2.internal]
+changed: [ip-10-0-10-214.ec2.internal]
+
+TASK [common : Asegurar que firewalld está activo y habilitado] ****************
+changed: [ip-10-0-20-86.ec2.internal]
+changed: [ip-10-0-10-214.ec2.internal]
+
+TASK [common : Permitir tráfico HTTP en el firewall local] *********************
+changed: [ip-10-0-10-214.ec2.internal]
+changed: [ip-10-0-20-86.ec2.internal]
+
+TASK [common : Crear usuario de despliegue (deploy) si no existe] **************
+changed: [ip-10-0-20-86.ec2.internal]
+changed: [ip-10-0-10-214.ec2.internal]
+
+TASK [webserver : Instalar Nginx] **********************************************
+ok: [ip-10-0-10-214.ec2.internal]
+ok: [ip-10-0-20-86.ec2.internal]
+
+TASK [webserver : Crear directorio web de la aplicación] ***********************
+changed: [ip-10-0-20-86.ec2.internal]
+changed: [ip-10-0-10-214.ec2.internal]
+
+TASK [webserver : Habilitar e iniciar Nginx] ***********************************
+ok: [ip-10-0-20-86.ec2.internal]
+ok: [ip-10-0-10-214.ec2.internal]
+
+TASK [webserver : Permitir HTTP en el firewall local (redundante con common, explícito aquí)] ***
+ok: [ip-10-0-10-214.ec2.internal]
+ok: [ip-10-0-20-86.ec2.internal]
+
+TASK [deploy : Crear directorio para el servicio del portal] *******************
+ok: [ip-10-0-20-86.ec2.internal]
+ok: [ip-10-0-10-214.ec2.internal]
+
+TASK [deploy : Copiar archivos del portal y del servicio] **********************
+[WARNING]: WorkerProcess for [ip-10-0-20-86.ec2.internal/TASK: deploy : Copiar archivos del portal y del servicio] errantly sent data directly to stderr instead of using Display:
+    Exception ignored while calling deallocator <function Connection.__del__ at 0x7e9e3e53b480>:
+    Traceback (most recent call last):
+      File "/usr/lib/python3/dist-packages/ansible_collections/amazon/aws/plugins/connection/aws_ssm.py", line 502, in __del__
+        s
+
+[WARNING]: WorkerProcess for [ip-10-0-10-214.ec2.internal/TASK: deploy : Copiar archivos del portal y del servicio] errantly sent data directly to stderr instead of using Display:
+    Exception ignored while calling deallocator <function Connection.__del__ at 0x7e9e3e537480>:
+    Traceback (most recent call last):
+      File "/usr/lib/python3/dist-packages/ansible_collections/amazon/aws/plugins/connection/aws_ssm.py", line 502, in __del__
+        s
+
+changed: [ip-10-0-20-86.ec2.internal] => (item={'src': 'index.html', 'dest': '/usr/share/nginx/html/rompecode/index.html'})
+changed: [ip-10-0-10-214.ec2.internal] => (item={'src': 'index.html', 'dest': '/usr/share/nginx/html/rompecode/index.html'})
+changed: [ip-10-0-20-86.ec2.internal] => (item={'src': 'server.py', 'dest': '/opt/rompecode/server.py'})
+changed: [ip-10-0-10-214.ec2.internal] => (item={'src': 'server.py', 'dest': '/opt/rompecode/server.py'})
+changed: [ip-10-0-20-86.ec2.internal] => (item={'src': 'nginx.conf', 'dest': '/etc/nginx/nginx.conf'})
+changed: [ip-10-0-10-214.ec2.internal] => (item={'src': 'nginx.conf', 'dest': '/etc/nginx/nginx.conf'})
+changed: [ip-10-0-10-214.ec2.internal] => (item={'src': 'rompecode.conf', 'dest': '/etc/nginx/conf.d/rompecode.conf'})
+changed: [ip-10-0-20-86.ec2.internal] => (item={'src': 'rompecode.conf', 'dest': '/etc/nginx/conf.d/rompecode.conf'})
+changed: [ip-10-0-20-86.ec2.internal] => (item={'src': 'rompecode.service', 'dest': '/etc/systemd/system/rompecode.service'})
+changed: [ip-10-0-10-214.ec2.internal] => (item={'src': 'rompecode.service', 'dest': '/etc/systemd/system/rompecode.service'})
+
+TASK [deploy : Validar configuración de Nginx] *********************************
+ok: [ip-10-0-10-214.ec2.internal]
+ok: [ip-10-0-20-86.ec2.internal]
+
+TASK [deploy : Mantener el servicio del portal activo] *************************
+changed: [ip-10-0-10-214.ec2.internal]
+changed: [ip-10-0-20-86.ec2.internal]
+
+RUNNING HANDLER [webserver : reiniciar nginx] **********************************
+changed: [ip-10-0-10-214.ec2.internal]
+changed: [ip-10-0-20-86.ec2.internal]
+
+PLAY RECAP *********************************************************************
+ip-10-0-10-214.ec2.internal : ok=14   changed=8    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ip-10-0-20-86.ec2.internal : ok=14   changed=8    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

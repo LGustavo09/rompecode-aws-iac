@@ -1,0 +1,17 @@
+EV-15 - Terminate selected ASG instance
+2026-11-18T22:53:26-05:00
+{
+    "TerminatingInstances": [
+        {
+            "InstanceId": "i-080896ba28181bb60",
+            "CurrentState": {
+                "Code": 32,
+                "Name": "shutting-down"
+            },
+            "PreviousState": {
+                "Code": 16,
+                "Name": "running"
+            }
+        }
+    ]
+}

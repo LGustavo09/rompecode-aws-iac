@@ -1,0 +1,9 @@
+EV-14 - Target Group before resiliency test
+2026-11-18T22:52:48-05:00
+------------------------------------
+|       DescribeTargetHealth       |
++----------------------+-----------+
+|  i-0e697600cbe26f9e0 |  healthy  |
+|  i-080896ba28181bb60 |  healthy  |
++----------------------+-----------+
+Instance selected for termination: i-080896ba28181bb60
