@@ -52,7 +52,7 @@
 
   <div class="card">
     <p class="label" style="margin-bottom:10px;">Prueba de Auto Scaling</p>
-    <button id="stressBtn" onclick="stressCPU()">🔥 Iniciar Stress Test CPU (30s)</button>
+    <button id="stressBtn" onclick="stressCPU()">🔥 Iniciar Stress Test CPU (5 min)</button>
     <p id="stressStatus" class="sub" style="margin-top:10px;"></p>
   </div>
 
@@ -60,52 +60,37 @@
 </div>
 
 <script>
-// IMDSv2: primero se obtiene un token, luego se consultan los metadatos.
 async function loadInstanceMetadata() {
   try {
-    const tokenRes = await fetch('http://169.254.169.254/latest/api/token', {
-      method: 'PUT',
-      headers: { 'X-aws-ec2-metadata-token-ttl-seconds': '21600' }
-    });
-    const token = await tokenRes.text();
-
-    const headers = { 'X-aws-ec2-metadata-token': token };
-    const [idRes, azRes] = await Promise.all([
-      fetch('http://169.254.169.254/latest/meta-data/instance-id', { headers }),
-      fetch('http://169.254.169.254/latest/meta-data/placement/availability-zone', { headers })
-    ]);
-
-    document.getElementById('instanceId').textContent = await idRes.text();
-    document.getElementById('az').textContent = await azRes.text();
-  } catch (e) {
-    document.getElementById('instanceId').textContent = 'N/D (fuera de EC2)';
-    document.getElementById('az').textContent = 'N/D (fuera de EC2)';
+    const response = await fetch('/api/info');
+    if (!response.ok) throw new Error('Metadatos no disponibles');
+    const info = await response.json();
+    document.getElementById('instanceId').textContent = info.instance_id;
+    document.getElementById('az').textContent = info.az;
+    document.getElementById('version').textContent = info.version;
+  } catch {
+    document.getElementById('instanceId').textContent = 'N/D';
+    document.getElementById('az').textContent = 'N/D';
   }
 }
 
-// Simula carga de CPU en el navegador/cliente para efectos de demo local.
-// En producción, este botón debería llamar a un endpoint del servidor
-// que ejecute un bucle de carga real en la instancia EC2.
-function stressCPU() {
-  const btn = document.getElementById('stressBtn');
+async function stressCPU() {
+  const button = document.getElementById('stressBtn');
   const status = document.getElementById('stressStatus');
-  btn.disabled = true;
-  status.textContent = 'Generando carga de CPU por 30 segundos...';
-
-  const end = Date.now() + 30000;
-  function burn() {
-    if (Date.now() < end) {
-      // trabajo intensivo de CPU
-      for (let i = 0; i < 1e6; i++) Math.sqrt(i);
-      setTimeout(burn, 0);
-    } else {
-      btn.disabled = false;
-      status.textContent = 'Prueba finalizada. Revisa CloudWatch para ver el escalado.';
-    }
+  button.disabled = true;
+  try {
+    const response = await fetch('/api/stress', {method: 'POST', headers: {'X-RompeCode-Test': '1'}});
+    status.textContent = response.status === 403
+      ? 'Abre el portal mediante un túnel de SSM para iniciar la prueba.'
+      : response.status === 202
+        ? 'Carga iniciada por cinco minutos. Revisa CloudWatch.'
+        : 'No se pudo iniciar la prueba. Revisa si ya hay una en curso.';
+  } catch {
+    status.textContent = 'No se pudo conectar con el servidor.';
+  } finally {
+    button.disabled = false;
   }
-  burn();
 }
-
 loadInstanceMetadata();
 </script>
 </body>

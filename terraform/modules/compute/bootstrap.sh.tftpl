@@ -1,0 +1,16 @@
+#!/bin/bash
+set -euo pipefail
+
+dnf install -y nginx python3 amazon-ssm-agent
+install -d -m 0755 /usr/share/nginx/html/rompecode /opt/rompecode
+
+%{ for destination, content in files ~}
+base64 --decode > "${destination}" <<'FILE'
+${content}
+FILE
+chmod 0644 "${destination}"
+%{ endfor ~}
+
+nginx -t
+systemctl daemon-reload
+systemctl enable --now nginx amazon-ssm-agent rompecode

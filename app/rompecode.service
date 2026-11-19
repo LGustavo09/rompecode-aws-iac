@@ -1,0 +1,15 @@
+[Unit]
+Description=RompeCode metadata and test service
+After=network-online.target
+
+[Service]
+User=nginx
+Group=nginx
+ExecStart=/usr/bin/python3 /opt/rompecode/server.py
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

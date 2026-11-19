@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - "terraform/**"
+      - "ansible/**"
+      - "app/**"
+      - ".github/workflows/terraform-ci.yml"
 
 permissions:
   id-token: write   # necesario para OIDC con AWS

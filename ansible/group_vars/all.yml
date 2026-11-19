@@ -1,5 +1,7 @@
 ---
 project_name: rompecode
-team_name: "Los Rompe Codigo"
-ansible_user: ec2-user
+team_name: "Los Rompe Codigos"
 ansible_python_interpreter: /usr/bin/python3
+ansible_connection: amazon.aws.aws_ssm
+ansible_aws_ssm_region: us-east-1
+ansible_aws_ssm_bucket_name: "{{ lookup('ansible.builtin.env', 'ANSIBLE_SSM_BUCKET') }}"
