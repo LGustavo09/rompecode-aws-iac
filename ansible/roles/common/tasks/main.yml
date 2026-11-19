@@ -5,7 +5,6 @@
 - name: Actualizar caché de paquetes e instalar utilidades base
   ansible.builtin.dnf:
     name:
-      - curl
       - git
       - unzip
       - firewalld
