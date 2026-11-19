@@ -1,0 +1,35 @@
+---
+# Rol deploy: despliega el código estático de la Landing Page
+
+- name: Copiar la Landing Page al servidor
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../app/index.html"
+    dest: /usr/share/nginx/html/rompecode/index.html
+    owner: nginx
+    group: nginx
+    mode: "0644"
+  become: true
+  notify: reiniciar nginx
+
+- name: Copiar assets adicionales si existen (css/js/imágenes)
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../app/"
+    dest: /usr/share/nginx/html/rompecode/
+    owner: nginx
+    group: nginx
+    mode: "0644"
+    directory_mode: "0755"
+  become: true
+  notify: reiniciar nginx
+
+- name: Registrar versión del despliegue
+  ansible.builtin.copy:
+    content: |
+      Deploy version: {{ deploy_version | default('dev') }}
+      Deployed at: {{ ansible_date_time.iso8601 }}
+      Host: {{ inventory_hostname }}
+    dest: /usr/share/nginx/html/rompecode/version.txt
+    owner: nginx
+    group: nginx
+    mode: "0644"
+  become: true

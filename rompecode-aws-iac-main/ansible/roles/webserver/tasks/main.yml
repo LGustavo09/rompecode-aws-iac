@@ -1,0 +1,42 @@
+---
+# Rol webserver: instala y configura Nginx de forma idempotente
+
+- name: Instalar Nginx
+  ansible.builtin.dnf:
+    name: nginx
+    state: present
+  become: true
+
+- name: Desplegar configuración personalizada de Nginx
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/conf.d/rompecode.conf
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  notify: reiniciar nginx
+
+- name: Crear directorio web de la aplicación
+  ansible.builtin.file:
+    path: /usr/share/nginx/html/rompecode
+    state: directory
+    owner: nginx
+    group: nginx
+    mode: "0755"
+  become: true
+
+- name: Habilitar e iniciar Nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: true
+  become: true
+
+- name: Permitir HTTP en el firewall local (redundante con common, explícito aquí)
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    immediate: true
+    state: enabled
+  become: true
