@@ -1,0 +1,13 @@
+﻿EV-13 - API stress: reintento exitoso por túnel SSM
+Fecha: 2026-11-18 (hora Bogotá)
+Las solicitudes directas al ALB devolvieron 403. El endpoint permite iniciar la carga desde una sesión SSM directa a una instancia.
+
+POST /api/stress con encabezado X-RompeCode-Test: 1
+HTTP 202
+{"duration_seconds":300}
+
+Respuesta obtenida desde ambas instancias originales:
+- i-0e697600cbe26f9e0: HTTP 202
+- i-060543cd2f90d01d2: HTTP 202
+Las repeticiones durante el periodo activo/de espera respondieron HTTP 409: prueba en curso o en periodo de espera.
+

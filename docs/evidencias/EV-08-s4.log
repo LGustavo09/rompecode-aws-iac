@@ -1,0 +1,23 @@
+EV-08 - Functional health and load-balancer distribution
+2026-11-18T22:51:29-05:00
+health HTTP 200
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-0e697600cbe26f9e0", "az": "us-east-1b"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}
+{"version": "1.0", "instance_id": "i-080896ba28181bb60", "az": "us-east-1a"}

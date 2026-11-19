@@ -1,0 +1,23 @@
+﻿EV-13 a EV-16 - Evidencia de stress, alarma y scale-out
+Cuenta AWS: 241227969876 | Región: us-east-1
+Fecha: 2026-11-19 UTC (2026-11-18 hora Bogotá)
+
+Carga API:
+- POST /api/stress mediante túnel SSM a i-0e697600cbe26f9e0 e i-060543cd2f90d01d2 devolvió HTTP 202, {"duration_seconds":300}.
+- Las solicitudes repetidas durante la prueba devolvieron HTTP 409 por prueba activa o periodo de espera.
+- La CPU llegó aproximadamente a 100% en las instancias originales.
+
+Alarma y escalado:
+- TargetTracking AlarmHigh pasó a ALARM tras 3 datapoints sobre 70%: 95.12%, 100%, 99.90% (04:10–04:12 UTC).
+- El 2026-11-19 04:13:55 UTC, la alarma activó la política rompecode-scale-up-cpu; capacidad deseada cambió de 2 a 3.
+- AWS lanzó i-0ee8d08853a4bfae9 a las 04:14 UTC.
+
+Estado final observado (2026-11-19 04:16 UTC):
+- ASG rompecode-asg: mínimo 2, deseado 3, máximo 6.
+- i-060543cd2f90d01d2, i-0e697600cbe26f9e0 e i-0ee8d08853a4bfae9: InService / Healthy.
+- Target group rompecode-tg: los 3 targets Healthy.
+- Monitoreo detallado desactivado en las tres instancias después de la prueba.
+- Se cerraron los tres túneles SSM de prueba.
+
+Limitación observada:
+- La nueva instancia se lanzó con Detailed Monitoring disabled. Para futuras alarmas de evaluación por minuto, Luis debe revisar la configuración de monitoreo en el Launch Template/ASG; habilitarlo solo en instancias actuales no persiste a los reemplazos.
